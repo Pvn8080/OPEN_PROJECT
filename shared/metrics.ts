@@ -1,17 +1,186 @@
-import {DateTime} from 'luxon';
-import type {ProjectDocument,ScheduleResult} from './model';
-import {schedule} from './schedule';
-import {workingHoursBetween} from './calendar';
-export interface TaskMetrics {work:number;cost:number;actualCost:number|null;actualWork:number|null}
-export interface Variance {id:string;title:string;state:'added'|'removed'|'changed';start:number;finish:number;duration:number;work:number;cost:number}
-export interface Workload {resourceId:string;date:string;demand:number;capacity:number;taskIds:string[]}
-export interface ProjectMetrics {work:number;cost:number;actualCost:number|null;percent:number;overdue:string[];overloads:Workload[];workloads:Workload[];taskMetrics:Record<string,TaskMetrics>;variance:Variance[];baselineCost:number|null}
-export function calculateMetrics(p:ProjectDocument,s:ScheduleResult,baselineId?:string):ProjectMetrics {
- const resources=new Map(p.resources.map(r=>[r.id,r])),tm:Record<string,TaskMetrics>={};const buckets=new Map<string,Workload>();let work=0,cost=0,actual=0,hasActual=false,totalDuration=0,progress=0;
- for(const t of p.tasks){if(s.tasks[t.id].summary)continue;let tw=0,tc=t.fixedCost,ta=t.actualFixedCost,aw=0,has=t.actualFixedCost>0;
- for(const a of p.assignments.filter(a=>a.taskId===t.id)){const r=resources.get(a.resourceId);if(!r)continue;const w=t.duration*a.allocation/100;tw+=w;tc+=w*r.rate;if(a.actualWork!==null){has=true;aw+=a.actualWork;ta+=a.actualWork*(a.actualRate??r.rate);}let d=DateTime.fromISO(s.tasks[t.id].start).setZone(p.calendar.timezone).startOf('day');const end=DateTime.fromISO(s.tasks[t.id].finish);for(let guard=0;d<end&&guard<40000;guard++,d=d.plus({days:1})){const hours=workingHoursBetween(s.tasks[t.id].start>d.toISO()!?s.tasks[t.id].start:d.toISO()!,end<d.plus({days:1})?end.toISO()!:d.plus({days:1}).toISO()!,p.calendar);if(hours<=0)continue;const date=d.toISODate()!,key=r.id+date,dayHours=p.calendar.exceptions[date]??(p.calendar.days.includes(d.weekday)?p.calendar.hours:0);const b=buckets.get(key)??{resourceId:r.id,date,demand:0,capacity:dayHours*r.capacity/100,taskIds:[]};b.demand+=hours*a.allocation/100;b.taskIds.push(t.id);buckets.set(key,b);}}
- tm[t.id]={work:tw,cost:tc,actualCost:has?ta:null,actualWork:has?aw:null};work+=tw;cost+=tc;actual+=ta;hasActual ||=has;totalDuration+=t.duration;progress+=t.duration*t.percent;}
- const leaves=p.tasks.filter(t=>!s.tasks[t.id].summary);const percent=totalDuration?progress/totalDuration:leaves.length?leaves.filter(t=>t.percent===100).length/leaves.length*100:0;const workloads=[...buckets.values()];const b=p.baselines.find(b=>b.id===(baselineId??p.baselines.at(-1)?.id));let variance:Variance[]=[];let baselineCost:number|null=null;
- if(b){const bs=schedule(b.document),bm=calculateMetrics({...b.document,baselines:[]},bs);baselineCost=bm.cost;const current=new Map(p.tasks.map(t=>[t.id,t])),old=new Map(b.document.tasks.map(t=>[t.id,t]));variance=[...new Set([...current.keys(),...old.keys()])].map(id=>{const t=current.get(id),o=old.get(id);return {id,title:t?.title??o!.title,state:!o?'added':!t?'removed':'changed',start:t&&o?workingHoursBetween(bs.tasks[id].start,s.tasks[id].start,p.calendar):0,finish:t&&o?workingHoursBetween(bs.tasks[id].finish,s.tasks[id].finish,p.calendar):0,duration:t&&o?t.duration-o.duration:0,work:t&&o?(tm[id]?.work??0)-(bm.taskMetrics[id]?.work??0):0,cost:t&&o?(tm[id]?.cost??0)-(bm.taskMetrics[id]?.cost??0):0};});}
- return {work,cost,actualCost:hasActual?actual:null,percent,workloads,overloads:workloads.filter(w=>w.demand>w.capacity+1e-6),taskMetrics:tm,variance,baselineCost,overdue:leaves.filter(t=>t.percent<100&&Date.parse(s.tasks[t.id].finish)<Date.parse(p.statusDate)).map(t=>t.id)};
+import { DateTime } from "luxon";
+import type { ProjectDocument, ScheduleResult } from "./model";
+import { schedule } from "./schedule";
+import { workingHoursBetween } from "./calendar";
+export interface TaskMetrics {
+  work: number;
+  cost: number;
+  actualCost: number | null;
+  actualWork: number | null;
+}
+export interface Variance {
+  id: string;
+  title: string;
+  state: "added" | "removed" | "changed";
+  start: number;
+  finish: number;
+  duration: number;
+  work: number;
+  cost: number;
+}
+export interface Workload {
+  resourceId: string;
+  date: string;
+  demand: number;
+  capacity: number;
+  taskIds: string[];
+}
+export interface ProjectMetrics {
+  work: number;
+  cost: number;
+  actualCost: number | null;
+  percent: number;
+  overdue: string[];
+  overloads: Workload[];
+  workloads: Workload[];
+  taskMetrics: Record<string, TaskMetrics>;
+  variance: Variance[];
+  baselineCost: number | null;
+}
+export function calculateMetrics(
+  p: ProjectDocument,
+  s: ScheduleResult,
+  baselineId?: string,
+): ProjectMetrics {
+  const resources = new Map(p.resources.map((r) => [r.id, r])),
+    tm: Record<string, TaskMetrics> = Object.create(null);
+  const buckets = new Map<string, Workload>();
+  let work = 0,
+    cost = 0,
+    actual = 0,
+    hasActual = false,
+    totalDuration = 0,
+    progress = 0;
+  for (const t of p.tasks) {
+    if (s.tasks[t.id].summary) continue;
+    let tw = 0,
+      tc = t.fixedCost,
+      ta = t.actualFixedCost,
+      aw = 0,
+      has = t.actualFixedCost > 0;
+    for (const a of p.assignments.filter((a) => a.taskId === t.id)) {
+      const r = resources.get(a.resourceId);
+      if (!r) continue;
+      const w = (t.duration * a.allocation) / 100;
+      tw += w;
+      tc += w * r.rate;
+      if (a.actualWork !== null) {
+        has = true;
+        aw += a.actualWork;
+        ta += a.actualWork * (a.actualRate ?? r.rate);
+      }
+      let d = DateTime.fromISO(s.tasks[t.id].start)
+        .setZone(p.calendar.timezone)
+        .startOf("day");
+      const end = DateTime.fromISO(s.tasks[t.id].finish);
+      for (
+        let guard = 0;
+        d < end && guard < 40000;
+        guard++, d = d.plus({ days: 1 })
+      ) {
+        const hours = workingHoursBetween(
+          s.tasks[t.id].start > d.toISO()! ? s.tasks[t.id].start : d.toISO()!,
+          end < d.plus({ days: 1 })
+            ? end.toISO()!
+            : d.plus({ days: 1 }).toISO()!,
+          p.calendar,
+        );
+        if (hours <= 0) continue;
+        const date = d.toISODate()!,
+          key = r.id + date,
+          dayHours =
+            p.calendar.exceptions[date] ??
+            (p.calendar.days.includes(d.weekday) ? p.calendar.hours : 0);
+        const b = buckets.get(key) ?? {
+          resourceId: r.id,
+          date,
+          demand: 0,
+          capacity: (dayHours * r.capacity) / 100,
+          taskIds: [],
+        };
+        b.demand += (hours * a.allocation) / 100;
+        b.taskIds.push(t.id);
+        buckets.set(key, b);
+      }
+    }
+    tm[t.id] = {
+      work: tw,
+      cost: tc,
+      actualCost: has ? ta : null,
+      actualWork: has ? aw : null,
+    };
+    work += tw;
+    cost += tc;
+    actual += ta;
+    hasActual ||= has;
+    totalDuration += t.duration;
+    progress += t.duration * t.percent;
+  }
+  const leaves = p.tasks.filter((t) => !s.tasks[t.id].summary);
+  const percent = totalDuration
+    ? progress / totalDuration
+    : leaves.length
+      ? (leaves.filter((t) => t.percent === 100).length / leaves.length) * 100
+      : 0;
+  const workloads = [...buckets.values()];
+  const b = p.baselines.find(
+    (b) => b.id === (baselineId ?? p.baselines.at(-1)?.id),
+  );
+  let variance: Variance[] = [];
+  let baselineCost: number | null = null;
+  if (b) {
+    const bs = schedule(b.document),
+      bm = calculateMetrics({ ...b.document, baselines: [] }, bs);
+    baselineCost = bm.cost;
+    const current = new Map(p.tasks.map((t) => [t.id, t])),
+      old = new Map(b.document.tasks.map((t) => [t.id, t]));
+    variance = [...new Set([...current.keys(), ...old.keys()])].map((id) => {
+      const t = current.get(id),
+        o = old.get(id);
+      return {
+        id,
+        title: t?.title ?? o!.title,
+        state: !o ? "added" : !t ? "removed" : "changed",
+        start:
+          t && o
+            ? workingHoursBetween(
+                bs.tasks[id].start,
+                s.tasks[id].start,
+                p.calendar,
+              )
+            : 0,
+        finish:
+          t && o
+            ? workingHoursBetween(
+                bs.tasks[id].finish,
+                s.tasks[id].finish,
+                p.calendar,
+              )
+            : 0,
+        duration: t && o ? t.duration - o.duration : 0,
+        work:
+          t && o ? (tm[id]?.work ?? 0) - (bm.taskMetrics[id]?.work ?? 0) : 0,
+        cost:
+          t && o ? (tm[id]?.cost ?? 0) - (bm.taskMetrics[id]?.cost ?? 0) : 0,
+      };
+    });
+  }
+  return {
+    work,
+    cost,
+    actualCost: hasActual ? actual : null,
+    percent,
+    workloads,
+    overloads: workloads.filter((w) => w.demand > w.capacity + 1e-6),
+    taskMetrics: tm,
+    variance,
+    baselineCost,
+    overdue: leaves
+      .filter(
+        (t) =>
+          t.percent < 100 &&
+          Date.parse(s.tasks[t.id].finish) < Date.parse(p.statusDate),
+      )
+      .map((t) => t.id),
+  };
 }
