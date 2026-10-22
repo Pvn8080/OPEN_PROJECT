@@ -5,7 +5,7 @@ Tested in the prepared Linux cloud workspace on October 21, 2026. This report di
 ## Current evidence
 
 - Domain/API suite: 41 passing tests, including all dependency types, signed lag, calendars/DST, critical path, automatic rescheduling, resource costs/capacity, baselines, templates, authorization, invitations, conflicts, AI lifecycle, persistence/reopening, and consistent backup/restore.
-- Browser coverage: 17 functional Chromium scenarios passed in the final combined run. The performance scenario exceeded its input-feedback budget in that run and passed an isolated recheck; the variability remains a limitation.
+- Browser coverage after redesign: all 17 functional Chromium scenarios pass. An intermediate combined run passed all 18 scenarios; the last combined run exceeded the large-project input-feedback budget. Scale variability remains a limitation.
 - Type checking and a production bundle build passed.
 - AI preview/apply/undo passed through the real API using an injected controlled provider. This does not establish live model connectivity or output quality.
 - The primary planner passed axe checks for serious/critical WCAG 2/2.1/2.2 A/AA violations. This is targeted automated evidence, not a complete WCAG conformance audit.
@@ -26,7 +26,7 @@ Tested in the prepared Linux cloud workspace on October 21, 2026. This report di
 | A10: sharing | Email-bound invitations, expiry/revocation, wrong-user denial, role checks and the viewer UI have tests. No emails were sent. |
 | A11: concurrent edits | API rejects stale revisions; browser preserves the unsaved task draft after another session changes the project. |
 | A12: AI unavailable | Missing-provider, timeout, cancellation, malformed commands, fabricated actuals, unauthorized changes, and synchronous-provider failures have tests. Manual editing remains available. |
-| A13: scale | The 1,000-task / 1,500-dependency / 100-resource fixture passes the Chromium four-times CPU-throttle test; raw measurements are saved with the final run. |
+| A13: scale | The 1,000-task / 1,500-dependency / 100-resource fixture meets recalculation timing, but input-feedback timing varies and exceeded the budget in the last combined run. |
 
 ## Performance method and limits
 
@@ -34,7 +34,7 @@ Machine: Linux x64, Intel Xeon Platinum 8573C, five reported logical CPUs, appro
 
 The fixture includes a long acyclic dependency chain plus additional edges. Thirty actual domain recalculations vary task duration; p95 must be below 1,000 ms. Thirty task-search input-to-next-frame measurements must be below 100 ms under four-times CPU throttling. Search filters settle after a 150 ms pause; input feedback measurements do not represent completion of filtering, network saves, or every possible drag interaction. Rendering virtualizes rows and culls dependency paths outside the visible row range.
 
-The final isolated performance recheck measured schedule p95 249.4 ms and input feedback p95 25.8 ms. The preceding combined run measured 244.3 ms and 470.8 ms respectively, exceeding the 100 ms feedback budget. Raw samples are in [performance evidence](evidence/performance.json). These are measurements on this machine, not universal device guarantees.
+Before redesign, an isolated performance recheck measured schedule p95 249.4 ms and input feedback p95 25.8 ms. After redesign, an intermediate complete run passed all 18 tests, while the last complete run measured schedule p95 265.4 ms and input feedback p95 535.7 ms, exceeding the 100 ms feedback budget. This intermittent scale failure is unresolved. Raw pre-redesign samples are in [performance evidence](evidence/performance.json); the latest redesign samples are in [redesign performance evidence](evidence/performance-redesign.json). These are measurements on this machine, not universal device guarantees.
 
 ## Remaining external validation
 
@@ -58,3 +58,13 @@ The final isolated performance recheck measured schedule p95 249.4 ms and input 
 [Current planner screen capture](evidence/open-project-preview.png). Earlier failed development checks were diagnosed, fixed, and rerun; no skipped live service is counted as passing.
 
 Independent review fixes preserve recorded actual-cost rates, retain pending edits through navigation and unrelated edits, and reuse request IDs after uncertain responses. Regression tests passed for all three fixes.
+
+## Professional design refresh
+
+- Installed local copies of UI Skills baseline-ui and the frontend-design skill with their licenses; documented official Fluent/Carbon references in [design language](design-language.md).
+- Replaced lavender neutrals, promotional copy and oversized chrome with navy navigation, compact summaries, consistent blue controls, clearer task states and adaptive bar-label contrast for resource colors.
+- Production build and TypeScript checks pass. All 41 domain/API tests pass.
+- All 17 functional browser scenarios pass after the final styling change. The scale scenario failed the 100 ms input-feedback budget in the last run; no universal responsiveness guarantee is claimed.
+- Targeted axe checks on the planner pass; a separate check with the AI panel open found no WCAG A/AA violations. This is not a full conformance audit. Desktop and narrow-screen captures were visually inspected.
+- [Full planner](evidence/open-project-redesign.png) and [AI panel](evidence/open-project-redesign-ai.png) show the current app.
+- Groq's official cookbook confirms free account-issued keys. No live key was created or available, and current quotas were not verified. The environment tool refused to modify the existing secret destination requirement; no changes were saved by that call. [Setup instructions](free-ai-setup.md) explain the remaining secure configuration.

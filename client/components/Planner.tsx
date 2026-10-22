@@ -33,6 +33,17 @@ import {
 import { Avatar, Modal, date, Empty } from "./ui";
 import { TaskSearch } from "./TaskSearch";
 import { TimelineHeader } from "./TimelineHeader";
+// Resource colors are user-selected, so labels must adapt to their background.
+function barTextColor(hex: string) {
+  const rgb = [1, 3, 5].map((offset) => {
+    const channel = parseInt(hex.slice(offset, offset + 2), 16) / 255;
+    return channel <= 0.04045
+      ? channel / 12.92
+      : ((channel + 0.055) / 1.055) ** 2.4;
+  });
+  const luminance = rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+  return luminance > 0.179 ? "#000000" : "#ffffff";
+}
 export function Planner({
   p,
   onSave,
@@ -288,7 +299,7 @@ export function Planner({
     lastVisible = visibleRows.at(-1)?.index ?? 0;
   const color = (t: Task) => {
     if (colorMode === "risk")
-      return s.critical.includes(t.id) ? "#d97d72" : "#89b6a4";
+      return s.critical.includes(t.id) ? "#c2413b" : "#477d68";
     if (colorMode === "owner") {
       const a = p.assignments.find((a) => a.taskId === t.id);
       return (
@@ -296,10 +307,10 @@ export function Planner({
       );
     }
     return t.percent === 100
-      ? "#75ab98"
+      ? "#348063"
       : t.percent > 0
-        ? "#8c7ad6"
-        : "#a2a6d7";
+        ? "#2563b5"
+        : "#8c9fb5";
   };
   return (
     <section className="planner-card">
@@ -508,7 +519,7 @@ export function Planner({
                   refY="2.5"
                   orient="auto"
                 >
-                  <path d="M0 0 L5 2.5 L0 5" fill="#b5afc8" />
+                  <path d="M0 0 L5 2.5 L0 5" fill="#94a3b8" />
                 </marker>
               </defs>
               {p.dependencies.map((d) => {
@@ -532,7 +543,7 @@ export function Planner({
                     key={d.id}
                     d={`M${sx},${sy} H${sx + 10} V${ty} H${tx - 3}`}
                     fill="none"
-                    stroke="#b5afc8"
+                    stroke="#94a3b8"
                     strokeWidth="1.2"
                     markerEnd="url(#arrow)"
                   />
@@ -714,7 +725,7 @@ export function Planner({
                             style={{
                               width: st.percent + "%",
                               background:
-                                st.percent === 100 ? "#6ca48a" : "#9583d3",
+                                st.percent === 100 ? "#348063" : "#2563b5",
                             }}
                           />
                         </span>
@@ -802,7 +813,12 @@ export function Planner({
                           className="bar-completion"
                           style={{ width: t.percent + "%" }}
                         />
-                        <span className="bar-label">{t.title}</span>
+                        <span
+                          className="bar-label"
+                          style={{ color: barTextColor(color(t)) }}
+                        >
+                          {t.title}
+                        </span>
                         {!readOnly && (
                           <>
                             <button

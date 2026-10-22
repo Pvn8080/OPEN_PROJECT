@@ -99,8 +99,8 @@ export function AIPanel({
           <Sparkles size={19} />
         </span>
         <div>
-          <b>Open Intelligence</b>
-          <small>Your planning partner</small>
+          <b>AI analyst</b>
+          <small>Project analysis and changes</small>
         </div>
         <button
           className="icon-button"
@@ -112,15 +112,11 @@ export function AIPanel({
       </header>
       <div className="ai-body">
         <div className="ai-intro">
-          <span className="ai-orbit">
-            <Sparkles size={24} />
-          </span>
-          <span className="eyebrow">A LITTLE INSIGHT. A BIG DIFFERENCE.</span>
-          <h2>Your project copilot</h2>
+          <span className="eyebrow">Project assistance</span>
+          <h2>What needs attention?</h2>
           <p>
-            See the possibilities.
-            <br />
-            Find your next best move.
+            Review delivery risks, explore schedule changes, or generate a plan.
+            You review changes before applying them.
           </p>
         </div>
         {!request && !job && (

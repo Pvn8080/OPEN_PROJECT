@@ -18,7 +18,6 @@ import {
   CalendarDays,
   Flag,
   Check,
-  ArrowUpRight,
   FolderKanban,
   LogOut,
   PanelLeftClose,
@@ -269,9 +268,7 @@ export function App() {
                 ? "Demo workspace"
                 : user.name.split(" ")[0] + "’s workspace"}
             </b>
-            <small>
-              {user.guest ? "A space to explore" : "Your team’s next chapter"}
-            </small>
+            <small>{user.guest ? "Sample projects" : "Team workspace"}</small>
           </span>
           <ChevronDown size={14} />
         </button>
@@ -285,7 +282,7 @@ export function App() {
           />
           <kbd>⌕</kbd>
         </div>
-        <span className="nav-caption">WORKSPACE</span>
+        <span className="nav-caption">Workspace</span>
         <nav className="workspace-nav">
           <button
             className={view === "overview" ? "active" : ""}
@@ -314,7 +311,7 @@ export function App() {
           </button>
         </nav>
         <div className="project-nav-heading">
-          <span className="nav-caption">YOUR PROJECTS</span>
+          <span className="nav-caption">Projects</span>
           <button
             className="icon-button"
             aria-label="New project"
@@ -358,20 +355,16 @@ export function App() {
             ) && <small className="muted">No matching projects.</small>}
         </div>
         <div className="sidebar-bottom">
-          <button className="ai-promo" onClick={() => setAI(true)}>
+          <button className="analyst-shortcut" onClick={() => setAI(true)}>
+            <Sparkles size={17} />
             <span>
-              <Sparkles size={16} />A fresh perspective
+              <b>AI analyst</b>
+              <small>Analyze and adjust your plan</small>
             </span>
-            <b>
-              Big ideas, meet a<br />
-              little intelligence.
-            </b>
-            <small>
-              Meet your AI analyst <ArrowUpRight size={13} />
-            </small>
+            <ChevronRight size={14} />
           </button>
           <div className="sidebar-help">
-            <span className="prototype-label">WEB PROTOTYPE</span>
+            <span className="prototype-label">Web preview</span>
             <button
               className="icon-button"
               aria-label="Workspace account"
@@ -384,9 +377,7 @@ export function App() {
             <Avatar name={user.name} />
             <button className="user-name" onClick={() => setDialog("account")}>
               <b>{user.name}</b>
-              <small>
-                {user.guest ? "Exploring the possibilities" : user.email}
-              </small>
+              <small>{user.guest ? "Demo account" : user.email}</small>
             </button>
             <button
               className="icon-button"
@@ -428,11 +419,11 @@ export function App() {
             <section className="project-heading">
               <div>
                 <div className="project-kicker">
-                  <span className="project-tag">TEAM PROJECT</span>
+                  <span className="project-tag">Project</span>
                   <span className="muted">
                     {p.role === "viewer"
                       ? "View-only access"
-                      : "A little structure. A lot of possibility."}
+                      : "Working schedule"}
                   </span>
                 </div>
                 <h1>
@@ -447,11 +438,12 @@ export function App() {
                   </button>
                 </h1>
                 <p>
-                  {doc.description || "Great work starts with a clear plan."}
+                  {doc.description ||
+                    "Manage tasks, dependencies and resources."}
                 </p>
               </div>
               <div className="project-heading-actions">
-                <div className="avatar-stack">
+                <div className="avatar-stack" aria-label="Assigned resources">
                   {doc.resources.slice(0, 3).map((r) => (
                     <Avatar
                       key={r.id}

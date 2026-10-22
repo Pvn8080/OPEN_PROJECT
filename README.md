@@ -37,7 +37,13 @@ The Node server serves both the built client and API on port 3001. Local data is
 - Use History or Undo/Redo to reverse changes. Reversals are validated and conservatively reject intervening edits rather than overwrite them.
 - Save the project as a template using the template icon. Actuals, invitations, baselines, and resource names are excluded; resource role placeholders remain.
 
+## Design
+
+The planner uses a restrained productivity design system, with navy navigation, blue actions, aligned data and accessible controls. See the [design language and sources](docs/design-language.md) and [updated planner preview](docs/evidence/open-project-redesign.png).
+
 ## AI setup
+
+For legitimate free-key options and Groq configuration, see [free AI setup](docs/free-ai-setup.md).
 
 Manual planning works without an AI provider. Live AI requires a server-side provider credential. Copy `.env.example` to an ignored `.env` file and supply values securely; never put keys in browser configuration or Git. The start commands load `.env` automatically.
 

@@ -57,7 +57,7 @@ test("plans, tracks resources and baselines, and preserves a saved project", asy
   ).toBeVisible();
   await page.getByRole("button", { name: "AI analyst", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Your project copilot" }),
+    page.getByRole("heading", { name: "What needs attention?" }),
   ).toBeVisible();
   await page.getByLabel("Ask your AI analyst").fill("Analyze delivery risks");
   await page.getByRole("button", { name: "Send to analyst" }).click();

@@ -10,8 +10,7 @@ export function Logo({ small = false }: { small?: boolean }) {
       </span>
       {!small && (
         <span>
-          open<span className="brand-light">project</span>
-          <span className="brand-dot">.</span>
+          Open <span className="brand-light">Project</span>
         </span>
       )}
     </div>
@@ -99,7 +98,7 @@ export function Loading() {
 }
 export function Avatar({
   name,
-  color = "#ede9fb",
+  color = "#e2e8f0",
   small = false,
 }: {
   name: string;

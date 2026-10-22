@@ -46,41 +46,42 @@ export function Auth({
       <section className="auth-story">
         <Logo />
         <div className="auth-copy">
-          <span className="eyebrow">BIG PLANS. CLEARER PATHS.</span>
+          <span className="eyebrow">Project planning workspace</span>
           <h1>
-            Your next big thing.
+            Every task. Every dependency.
             <br />
-            <em>Beautifully planned.</em>
+            One clear plan.
           </h1>
           <p>
-            All the power your projects need.
-            <br />A little more clarity. A lot more possibility.
+            Schedule work, assign resources and track delivery.
+            <br />
+            Built for teams that need to see the whole project.
           </p>
           <div className="auth-features">
             <span>
               <ChartNoAxesGantt size={18} />
-              Plans that move with you
+              Interactive Gantt scheduling
             </span>
             <span>
               <Users size={18} />
-              Your team, in sync
+              Resource and capacity planning
             </span>
             <span>
               <Sparkles size={18} />
-              Intelligence built right in
+              AI analysis with reviewed changes
             </span>
           </div>
         </div>
         <div className="auth-mini-plan">
           <div className="mini-header">
             <Layers size={16} />
-            <b>From idea to impact</b>
+            <b>Product release</b>
             <span>On track</span>
           </div>
           {[
-            "Discover the possibilities",
-            "Make something great",
-            "Ready for the world",
+            "Discovery and scope",
+            "Design and implementation",
+            "Validation and release",
           ].map((t, i) => (
             <div className="mini-plan-row" key={t}>
               <span>
@@ -98,10 +99,10 @@ export function Auth({
           ))}
           <div className="mini-ai">
             <Sparkles size={16} />
-            <span>A clearer way forward starts here.</span>
+            <span>Dependencies connect each phase.</span>
           </div>
         </div>
-        <small>OPEN PROJECT · MADE FOR WHAT’S NEXT</small>
+        <small>Open Project / Planning workspace</small>
       </section>
       <section className="auth-form-wrap">
         <form
@@ -111,16 +112,14 @@ export function Auth({
           }}
           className="auth-form"
         >
-          <span className="pill">YOUR WORKSPACE AWAITS</span>
+          <span className="pill">Project workspace</span>
           <h2>
-            {register
-              ? "Make room for great work."
-              : "Welcome to Open Project."}
+            {register ? "Create your workspace." : "Welcome to Open Project."}
           </h2>
           <p>
             {register
               ? "Create your account and bring your team along."
-              : "A thoughtful space for ambitious projects."}
+              : "Sign in to continue planning."}
           </p>
           {register && (
             <Field label="Your name">
@@ -164,7 +163,7 @@ export function Auth({
             <ArrowRight size={17} />
           </button>
           <div className="auth-switch">
-            {register ? "Already have an account?" : "New around here?"}{" "}
+            {register ? "Already have an account?" : "Need an account?"}{" "}
             <button type="button" onClick={() => setRegister(!register)}>
               {register ? "Sign in" : "Create an account"}
             </button>
