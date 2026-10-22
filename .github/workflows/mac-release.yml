@@ -31,7 +31,10 @@ jobs:
           BUILD_ARCH: ${{ matrix.architecture }}
         run: |
           APP="mac-release/Open Project-darwin-${BUILD_ARCH}/Open Project.app"
-          codesign --verify --deep --strict --verbose=2 "$APP"
+          if ! codesign --verify --deep --strict --verbose=2 "$APP" 2> signature-check.txt; then
+            while IFS= read -r line; do echo "::error::$line"; done < signature-check.txt
+            exit 1
+          fi
           file "$APP/Contents/MacOS/Open Project"
           mkdir -p downloads
           ditto -c -k --sequesterRsrc --keepParent "$APP" "downloads/Open-Project-Mac-${BUILD_ARCH}.zip"

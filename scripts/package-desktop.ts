@@ -23,6 +23,8 @@ const paths = await packager({
     process.platform === "darwin"
       ? {
           identity: "-",
+          identityValidation: false,
+          continueOnError: false,
           optionsForFile: () => ({
             entitlements: resolve("desktop/entitlements.plist"),
           }),
