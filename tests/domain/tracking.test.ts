@@ -178,3 +178,20 @@ it("materializes scheduled dates while letting automatic successors move earlier
     "2026-10-27T09:00:00.000-07:00",
   );
 });
+it("freezes actual hourly rates at the authoritative command boundary", () => {
+  const p = fixture();
+  const recorded = previewCommands(p, [
+    { type: "assignment.update", id: "a", patch: { actualWork: 2 } },
+  ]).document;
+  expect(recorded.assignments[0].actualRate).toBe(50);
+  const changed = previewCommands(recorded, [
+    { type: "resource.update", id: "r", patch: { rate: 100 } },
+  ]).document;
+  expect(calculateMetrics(changed, schedule(changed)).actualCost).toBe(100);
+  const legacy = fixture();
+  legacy.assignments[0].actualWork = 2;
+  const migrated = previewCommands(legacy, [
+    { type: "resource.update", id: "r", patch: { rate: 100 } },
+  ]).document;
+  expect(calculateMetrics(migrated, schedule(migrated)).actualCost).toBe(100);
+});

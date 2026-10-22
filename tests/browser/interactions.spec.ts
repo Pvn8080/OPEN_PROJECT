@@ -246,16 +246,12 @@ test("reorders tasks with the row drag handle", async ({ page }) => {
   await page.getByRole("button", { name: "Add task", exact: true }).click();
   await page.getByLabel("Task name", { exact: true }).fill("Reorder second");
   await page.getByRole("button", { name: "Create task", exact: true }).click();
-  const first = page
-      .locator(".grid-cells")
-      .filter({
-        has: page.getByRole("button", { name: "Reorder first", exact: true }),
-      }),
-    second = page
-      .locator(".grid-cells")
-      .filter({
-        has: page.getByRole("button", { name: "Reorder second", exact: true }),
-      });
+  const first = page.locator(".grid-cells").filter({
+      has: page.getByRole("button", { name: "Reorder first", exact: true }),
+    }),
+    second = page.locator(".grid-cells").filter({
+      has: page.getByRole("button", { name: "Reorder second", exact: true }),
+    });
   await second.locator(".row-number").hover();
   await page
     .getByRole("button", { name: "Reorder Reorder second", exact: true })
@@ -266,4 +262,91 @@ test("reorders tasks with the row drag handle", async ({ page }) => {
   const a = p.document.tasks.find((t: any) => t.title === "Reorder first"),
     b = p.document.tasks.find((t: any) => t.title === "Reorder second");
   expect(b.order).toBeLessThan(a.order);
+});
+test("keeps a conflicting draft through navigation and rejects replacing it with another edit", async ({
+  page,
+}) => {
+  await demo(page);
+  const list = await (await page.request.get("/api/projects")).json(),
+    url = "/api/projects/" + list[0].id,
+    p = await (await page.request.get(url)).json();
+  await page.getByRole("button", { name: "Add task", exact: true }).click();
+  await page.getByLabel("Task name", { exact: true }).fill("Protected draft");
+  await page.request.post(url + "/changes", {
+    data: {
+      revision: p.revision,
+      requestId: "conflict-" + Date.now(),
+      commands: [
+        {
+          type: "project.update",
+          patch: { description: "Teammate changed this plan" },
+        },
+      ],
+    },
+  });
+  await page.getByRole("button", { name: "Create task", exact: true }).click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
+    "draft is preserved",
+  );
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Website redesign", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("unsaved draft");
+  await expect(
+    page.getByRole("button", { name: "View retained changes" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Add task", exact: true }).click();
+  await page.getByLabel("Task name", { exact: true }).fill("Unrelated edit");
+  await page.getByRole("button", { name: "Create task", exact: true }).click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
+    "unsaved draft",
+  );
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "View retained changes" }).click();
+  await expect(page.getByRole("dialog")).toContainText("Protected draft");
+  await expect(page.getByRole("dialog")).not.toContainText("Unrelated edit");
+  await page
+    .getByRole("button", { name: "Discard draft", exact: true })
+    .click();
+  await expect(
+    page.getByText("All changes saved", { exact: true }),
+  ).toBeVisible();
+});
+test("reuses an uncertain baseline request after its successful response is lost", async ({
+  page,
+}) => {
+  await demo(page);
+  await page.route(
+    "**/api/projects/*/changes",
+    async (route) => {
+      await route.fetch();
+      await route.abort("failed");
+    },
+    { times: 1 },
+  );
+  await page.getByRole("button", { name: "Set baseline", exact: true }).click();
+  await page.getByLabel("Baseline name").fill("Lost response baseline");
+  await page
+    .getByRole("button", { name: "Save baseline", exact: true })
+    .click();
+  await expect(
+    page.getByRole("dialog").getByText(/fetch|network|failed/i),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Reload & review draft", exact: true })
+    .click();
+  await page.getByRole("button", { name: "View retained changes" }).click();
+  await page.getByRole("button", { name: "Apply to current revision" }).click();
+  await expect(
+    page.getByText("All changes saved", { exact: true }),
+  ).toBeVisible();
+  const list = await (await page.request.get("/api/projects")).json(),
+    p = await (await page.request.get("/api/projects/" + list[0].id)).json();
+  expect(
+    p.document.baselines.filter(
+      (b: any) => b.name === "Lost response baseline",
+    ),
+  ).toHaveLength(1);
 });

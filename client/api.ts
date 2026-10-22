@@ -54,7 +54,7 @@ export async function api<T = any>(
 export const apply = (
   p: Envelope,
   commands: Command[],
-  requestId = crypto.randomUUID(),
+  requestId: string = crypto.randomUUID(),
 ) =>
   api<Envelope>("/projects/" + p.document.id + "/changes", "POST", {
     revision: p.revision,

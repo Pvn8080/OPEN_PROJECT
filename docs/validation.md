@@ -4,8 +4,8 @@ Tested in the prepared Linux cloud workspace on October 21, 2026. This report di
 
 ## Current evidence
 
-- Domain/API suite: 40 passing tests, including all dependency types, signed lag, calendars/DST, critical path, automatic rescheduling, resource costs/capacity, baselines, templates, authorization, invitations, conflicts, AI lifecycle, persistence/reopening, and consistent backup/restore.
-- Browser coverage: the 14-scenario Chromium suite passed. Additional targeted checks passed for the calendar exception form and native row reordering. A combined final run is recorded below when completed.
+- Domain/API suite: 41 passing tests, including all dependency types, signed lag, calendars/DST, critical path, automatic rescheduling, resource costs/capacity, baselines, templates, authorization, invitations, conflicts, AI lifecycle, persistence/reopening, and consistent backup/restore.
+- Browser coverage: 17 functional Chromium scenarios passed in the final combined run. The performance scenario exceeded its input-feedback budget in that run and passed an isolated recheck; the variability remains a limitation.
 - Type checking and a production bundle build passed.
 - AI preview/apply/undo passed through the real API using an injected controlled provider. This does not establish live model connectivity or output quality.
 - The primary planner passed axe checks for serious/critical WCAG 2/2.1/2.2 A/AA violations. This is targeted automated evidence, not a complete WCAG conformance audit.
@@ -34,7 +34,7 @@ Machine: Linux x64, Intel Xeon Platinum 8573C, five reported logical CPUs, appro
 
 The fixture includes a long acyclic dependency chain plus additional edges. Thirty actual domain recalculations vary task duration; p95 must be below 1,000 ms. Thirty task-search input-to-next-frame measurements must be below 100 ms under four-times CPU throttling. Search filters settle after a 150 ms pause; input feedback measurements do not represent completion of filtering, network saves, or every possible drag interaction. Rendering virtualizes rows and culls dependency paths outside the visible row range.
 
-The latest full run before the calendar/reorder form checks measured schedule p95 approximately 430 ms and input feedback p95 approximately 22 ms. These are measurements on this machine, not universal device guarantees.
+The final isolated performance recheck measured schedule p95 249.4 ms and input feedback p95 25.8 ms. The preceding combined run measured 244.3 ms and 470.8 ms respectively, exceeding the 100 ms feedback budget. Raw samples are in [performance evidence](evidence/performance.json). These are measurements on this machine, not universal device guarantees.
 
 ## Remaining external validation
 
@@ -46,4 +46,15 @@ The latest full run before the calendar/reorder form checks measured schedule p9
 
 ## Final combined verification
 
-Final test and startup results are appended after execution. Earlier failed development checks were diagnosed and corrected; they are not counted as passing checks until rerun.
+- `npm test`: 41 tests passed.
+- `npm run test:e2e`: 17 functional scenarios passed; one performance scenario failed its feedback threshold and passed an isolated recheck (15.0 seconds). All 18 scenarios have passing evidence, but the final combined run was not wholly green.
+- `npm run typecheck` and `npm run build`: passed.
+- `npm ci`: completed from the committed lockfile (239 packages); rebuilt successfully afterward.
+- Built application startup: served HTML and five bundled assets, authenticated a demo session, created a software-delivery project, persisted a named baseline, and reloaded revision 1 successfully.
+- `npm run db:backup`: created an integrity-checked snapshot; the automated backup test opens the snapshot and verifies preserved data without later source writes.
+- Development startup restarted successfully; client and API functional HTTP checks returned 200.
+- Reusable `install_script` and `start_skill`, non-secret AI provider defaults, and the `AI_API_KEY` requirement were saved in the environment draft. `api.openai.com` was added for that credential destination. Saving did not apply or publish those settings.
+
+[Current planner screen capture](evidence/open-project-preview.png). Earlier failed development checks were diagnosed, fixed, and rerun; no skipped live service is counted as passing.
+
+Independent review fixes preserve recorded actual-cost rates, retain pending edits through navigation and unrelated edits, and reuse request IDs after uncertain responses. Regression tests passed for all three fixes.

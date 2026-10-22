@@ -70,6 +70,13 @@ export function App() {
     return items;
   };
   const changed = (next: Envelope) => {
+    if (state.pending && next.document.id !== state.project?.document.id) {
+      state.setError(
+        "Review or discard your unsaved draft before switching projects.",
+      );
+      void refreshList();
+      return;
+    }
     state.setProject(next);
     void refreshList();
     setRedoId(null);
@@ -218,6 +225,13 @@ export function App() {
     }
   };
   const logout = async () => {
+    if (state.pending) {
+      state.setError(
+        "Review or discard your unsaved draft before signing out.",
+      );
+      return;
+    }
+    setDialog(null);
     await api("/auth/logout", "POST", {});
     setUser(null);
     state.setProject(null);
@@ -850,6 +864,16 @@ export function App() {
             />
           </div>
           <footer>
+            <button
+              className="danger text-button"
+              onClick={() => {
+                state.setPending(null);
+                state.setError("");
+                setDialog(null);
+              }}
+            >
+              Discard draft
+            </button>
             <button className="secondary" onClick={() => setDialog(null)}>
               Keep draft
             </button>

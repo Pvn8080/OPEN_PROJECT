@@ -11,6 +11,7 @@ import {
   type ProjectDocument,
   type Command,
   type ChangePreview,
+  type Assignment,
 } from "./model";
 import { schedule } from "./schedule";
 import { workingHoursBetween } from "./calendar";
@@ -85,6 +86,14 @@ export function previewCommands(
 ): ChangePreview {
   const commands = z.array(commandSchema).min(1).max(2000).parse(raw),
     p = structuredClone(input);
+  const captureRate = (a: Assignment) => {
+    if (a.actualWork !== null && a.actualRate === null) {
+      const resource = p.resources.find((r) => r.id === a.resourceId);
+      if (resource) a.actualRate = resource.rate;
+    }
+  };
+  // Freeze legacy unpriced actuals before any rate change in this transaction.
+  p.assignments.forEach(captureRate);
   const before = schedule(input);
   const deleted = { tasks: 0, assignments: 0, dependencies: 0 };
   const find = <T extends { id: string }>(arr: T[], key: string) => {
@@ -177,12 +186,21 @@ export function previewCommands(
         find(p.dependencies, c.id);
         p.dependencies = p.dependencies.filter((d) => d.id !== c.id);
         break;
-      case "assignment.add":
-        p.assignments.push(c.assignment);
+      case "assignment.add": {
+        const assignment = { ...c.assignment };
+        captureRate(assignment);
+        p.assignments.push(assignment);
         break;
-      case "assignment.update":
-        Object.assign(find(p.assignments, c.id), c.patch);
+      }
+      case "assignment.update": {
+        const assignment = find(p.assignments, c.id),
+          recordedRate = assignment.actualRate;
+        Object.assign(assignment, c.patch);
+        if (assignment.actualWork !== null && assignment.actualRate === null)
+          assignment.actualRate = recordedRate;
+        captureRate(assignment);
         break;
+      }
       case "assignment.delete":
         find(p.assignments, c.id);
         p.assignments = p.assignments.filter((a) => a.id !== c.id);
