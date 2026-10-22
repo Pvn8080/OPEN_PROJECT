@@ -23,19 +23,21 @@
 
 ### Task 1: Desktop backend and settings
 Files: desktop/service.ts, desktop/settings.ts, desktop/main.ts, desktop/preload.ts, tests/server/desktop.test.ts.
-- [ ] Add failing tests for authenticated service access, local persistent sessions, preference validation and credential preservation.
-- [ ] Implement loopback service, safe settings and desktop lifecycle/menu/IPC.
-- [ ] Run targeted tests and typecheck.
+- [x] Add failing tests for authenticated service access, local persistent sessions, preference validation and credential preservation.
+- [x] Implement loopback service, safe settings and desktop lifecycle/menu/IPC.
+- [x] Run targeted tests and typecheck.
 
 ### Task 2: Mac interface and preferences
 Files: client/mac-theme.css, client/desktop.ts, client/components/DesktopSettings.tsx, client/App.tsx, client/main.tsx.
-- [ ] Apply selected light native visual system and compact project chrome.
-- [ ] Add desktop settings entry, truthful local status and hosted-sharing explanation.
-- [ ] Verify planner interactions and automated contrast checks; inspect captures.
+- [x] Apply selected light native visual system and compact project chrome.
+- [x] Add desktop settings entry, truthful local status and hosted-sharing explanation.
+- [x] Verify planner interactions and automated contrast checks; inspect captures.
 
 ### Task 3: Packages and validation
 Files: scripts/build-desktop.ts, scripts/package-desktop.ts, desktop/README.md, package.json.
-- [ ] Bundle main/preload/backend and client; package arm64/x64 Mac .app bundles.
-- [ ] Verify packaged structure, runtime version, bundle architectures and no workspace data/keys in payloads.
-- [ ] Run full unit/API tests and production build; attempt desktop runtime smoke where supported.
-- [ ] Create ZIP artifacts with accurate install/limitations notes; commit source and documentation.
+- [x] Bundle main/preload/backend and client; package arm64/x64 Mac .app bundles.
+- [x] Verify packaged structure, runtime version, bundle architectures and no workspace data/keys in payloads.
+- [x] Run full unit/API tests and production build; attempt desktop runtime smoke where supported.
+- [x] Create ZIP artifacts with accurate install/limitations notes; commit source and documentation.
+
+Actual evidence and remaining Mac-specific checks are recorded in desktop/README.md and docs/validation.md. The runtime smoke used Linux Electron, not macOS.

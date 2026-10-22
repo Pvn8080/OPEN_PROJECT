@@ -2,7 +2,11 @@
 
 A shared project planner with a synchronized task grid and Gantt timeline, resource capacity, progress, baselines, reusable templates, and an AI analyst that proposes validated changes.
 
-This is a web prototype. Microsoft Project file compatibility and native Mac/Windows packaging are outside this release.
+This is a prototype with web and experimental Mac desktop builds. Microsoft Project file compatibility and Windows packaging remain outside this release.
+
+## Mac desktop development builds
+
+The desktop build bundles the real SQLite backend and a light Mac-style interface. See [Mac install, AI settings, backup and verification details](desktop/README.md). These are ad-hoc-signed development builds without notarization or actual Mac runtime validation.
 
 ## Try without installing anything
 

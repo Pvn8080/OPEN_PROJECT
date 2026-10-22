@@ -1,3 +1,5 @@
+import { desktop } from "./desktop";
+import { DesktopSettings } from "./components/DesktopSettings";
 import { CommandSummary } from "./components/CommandSummary";
 import { useEffect, useMemo, useState } from "react";
 import { DateTime } from "luxon";
@@ -60,6 +62,10 @@ export function App() {
     [redoId, setRedoId] = useState<string | null>(null),
     [toast, setToast] = useState(""),
     [projectQuery, setProjectQuery] = useState("");
+  useEffect(
+    () => desktop?.onOpenSettings(() => setDialog("desktop-settings")),
+    [],
+  );
   const state = useProject(),
     { project: p } = state;
   const doc = p?.document;
@@ -259,16 +265,24 @@ export function App() {
         </div>
         <button
           className="workspace-picker"
-          onClick={() => setDialog("account")}
+          onClick={() => setDialog(desktop ? "desktop-settings" : "account")}
         >
           <span className="workspace-icon">{user.name[0]}</span>
           <span>
             <b>
-              {user.guest
-                ? "Demo workspace"
-                : user.name.split(" ")[0] + "’s workspace"}
+              {desktop
+                ? "My workspace"
+                : user.guest
+                  ? "Demo workspace"
+                  : user.name.split(" ")[0] + "’s workspace"}
             </b>
-            <small>{user.guest ? "Sample projects" : "Team workspace"}</small>
+            <small>
+              {desktop
+                ? "On this Mac"
+                : user.guest
+                  ? "Sample projects"
+                  : "Team workspace"}
+            </small>
           </span>
           <ChevronDown size={14} />
         </button>
@@ -364,28 +378,45 @@ export function App() {
             <ChevronRight size={14} />
           </button>
           <div className="sidebar-help">
-            <span className="prototype-label">Web preview</span>
+            <span className="prototype-label">
+              {desktop ? "On this Mac" : "Web preview"}
+            </span>
             <button
               className="icon-button"
-              aria-label="Workspace account"
-              onClick={() => setDialog("account")}
+              aria-label={desktop ? "App settings" : "Workspace account"}
+              onClick={() =>
+                setDialog(desktop ? "desktop-settings" : "account")
+              }
             >
               <Settings2 size={16} />
             </button>
           </div>
           <div className="user-card">
             <Avatar name={user.name} />
-            <button className="user-name" onClick={() => setDialog("account")}>
-              <b>{user.name}</b>
-              <small>{user.guest ? "Demo account" : user.email}</small>
-            </button>
             <button
-              className="icon-button"
-              aria-label="Sign out"
-              onClick={() => void logout()}
+              className="user-name"
+              onClick={() =>
+                setDialog(desktop ? "desktop-settings" : "account")
+              }
             >
-              <LogOut size={15} />
+              <b>{user.name}</b>
+              <small>
+                {desktop
+                  ? "Personal workspace"
+                  : user.guest
+                    ? "Demo account"
+                    : user.email}
+              </small>
             </button>
+            {!desktop && (
+              <button
+                className="icon-button"
+                aria-label="Sign out"
+                onClick={() => void logout()}
+              >
+                <LogOut size={15} />
+              </button>
+            )}
           </div>
         </div>
       </aside>
@@ -409,7 +440,7 @@ export function App() {
           <div>
             <span className="live-status">
               <i />
-              Workspace connected
+              {desktop ? "Local workspace" : "Workspace connected"}
             </span>
             <Avatar name={user.name} small />
           </div>
@@ -456,7 +487,7 @@ export function App() {
                 <button
                   className="secondary"
                   aria-label="Share project"
-                  onClick={() => setDialog("share")}
+                  onClick={() => setDialog(desktop ? "local-sharing" : "share")}
                 >
                   <Share2 size={15} />
                   Share
@@ -756,6 +787,28 @@ export function App() {
             setDialog("task");
           }}
         />
+      )}
+      {dialog === "desktop-settings" && desktop && (
+        <DesktopSettings onClose={() => setDialog(null)} />
+      )}
+      {dialog === "local-sharing" && (
+        <Modal title="Share a workspace" onClose={() => setDialog(null)}>
+          <div className="modal-body">
+            <p className="muted">
+              This workspace is saved on your Mac. Remote team sharing requires
+              a hosted workspace; local invitation links would not work for
+              teammates.
+            </p>
+            <p className="hint">
+              You can save a database copy using File → Back Up Workspace.
+            </p>
+          </div>
+          <footer>
+            <button className="primary" onClick={() => setDialog(null)}>
+              Done
+            </button>
+          </footer>
+        </Modal>
       )}
       {dialog === "task" && doc && (
         <TaskInspector

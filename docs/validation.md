@@ -82,3 +82,11 @@ The task pane now defaults to 460 px, leaving more timeline visible. Short bars 
 `npm run build:portable` generates a self-contained browser app at `portable/Open-Project.html`. The downloadable ZIP includes that HTML and instructions. The original server build continues to use its authenticated HTTP API; only the separate portable build substitutes a browser-local storage adapter.
 
 Three added tests passed for persistence/revision conflicts, baseline retry idempotency/undo, and honest rejection of server-only features. The full domain/API suite now passes 44 tests. The production build and TypeScript checks pass. A browser smoke check loaded the exact HTML as a document with all other requests blocked: task creation survived reload, a baseline was saved and a JSON backup downloaded, with zero additional network requests. The backup contained one project and three history entries. Direct file navigation is blocked by managed Chromium policy, so downloaded-file behavior on a personal computer remains a manual check. No public URL or hosted deployment is claimed.
+
+## Mac desktop development build
+
+49 domain/API tests and 15 relevant browser scenarios passed. Actual Linux Electron smoke verified the bundled planner, task creation, sandboxed settings IPC, checked backup with stubbed native dialog, and persistence after relaunch. A regression smoke verified that canceled Quit with a retained draft keeps the backend running.
+
+Independent review found three important issues: backup could overwrite live data, a local session expired after seven days, and canceled Quit disconnected the backend. Each was reproduced with a failing regression test and fixed; the complete 49-test suite passed afterward. No deferred minors.
+
+Mac arm64/x64 .app bundles were cross-built, with architecture, macOS 13 minimum and icon checks. Independent ad-hoc code-page hash checks passed for 14 Mach-O files per bundle. rcodesign's general verifier reports empty CMS data for ad-hoc signatures; Apple codesign/Gatekeeper validation is not claimed. No actual Mac launch, title bar, Keychain, notarization, live provider or remote collaboration verification is claimed. See [desktop build notes](../desktop/README.md).

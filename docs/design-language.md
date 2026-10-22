@@ -30,3 +30,7 @@ The old lavender neutrals were replaced throughout existing modal, resource, tem
 ## Verification
 
 Visual captures include the full planner and the planner with the AI analyst open. Automated browser checks cover keyboard/pointer interactions, task editing, resources, baselines, conflicts, sharing and targeted accessibility. See `docs/validation.md` for actual results and remaining limitations.
+
+## Native Mac direction
+
+The user selected a light native Mac direction and requested the [apple-design skill](../.agents/skills/apple-design/SKILL.md) from emilkowalski/skills. Installation succeeded using the requested CLI. `client/mac-theme.css` applies light navigation, platform system typography, compact controls, restrained structure, responsive feedback and accessibility preferences. [Current browser-rendered design](evidence/mac-design.png) is not a Mac runtime capture.

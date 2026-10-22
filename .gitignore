@@ -7,3 +7,6 @@ data/
 playwright-report/
 test-results/
 *.log
+
+desktop-build/
+mac-release/

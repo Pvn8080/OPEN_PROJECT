@@ -1,0 +1,24 @@
+[
+  {
+    "file": "Open-Project-Mac-Apple-Silicon.zip",
+    "architecture": "arm64",
+    "bytes": 120420986,
+    "sha256": "39f657bfbc282dbda390685e6283373e314281c0e09c414ecfe0847aa962e2b1",
+    "version": "0.2.0",
+    "macOSMinimum": "13.0",
+    "signing": "ad-hoc",
+    "notarized": false,
+    "MacRuntimeTested": false
+  },
+  {
+    "file": "Open-Project-Mac-Intel.zip",
+    "architecture": "x64",
+    "bytes": 126586376,
+    "sha256": "2bd5cb68f68462c85cb877c54554f42f8d57aa291237d73546cddac2d4b15e2c",
+    "version": "0.2.0",
+    "macOSMinimum": "13.0",
+    "signing": "ad-hoc",
+    "notarized": false,
+    "MacRuntimeTested": false
+  }
+]

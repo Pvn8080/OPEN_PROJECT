@@ -12,5 +12,14 @@
     "noEmit": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["shared", "server", "client", "tests", "*.ts"]
+  "include": [
+    "shared",
+    "server",
+    "client",
+    "tests",
+    "*.ts",
+    "desktop",
+    "preview",
+    "scripts"
+  ]
 }
