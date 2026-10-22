@@ -4,6 +4,16 @@ A shared project planner with a synchronized task grid and Gantt timeline, resou
 
 This is a web prototype. Microsoft Project file compatibility and native Mac/Windows packaging are outside this release.
 
+## Try without installing anything
+
+Open [the portable preview](portable/Open-Project.html) in a desktop browser. Save the HTML file to your computer and open it there. It contains the UI, scheduling engine and styles in one file, with no server or API key required. The sample workspace opens automatically.
+
+Edit tasks, drag Gantt bars, manage resources, capture baselines and use Undo. Changes are saved in that browser's local storage. Use **Export backup** to save a JSON copy. Keep the HTML in the same location and use the same browser; clearing browser data or private browsing can remove saved work.
+
+This is a local interactive prototype: account registration, AI, invitations and team sharing require the server version. It does not connect to the cloud workspace database.
+
+Rebuild the portable file with `npm run build:portable`. Direct `file://` navigation is blocked by the managed test browser, so standalone behavior was tested by serving the exact single HTML with every other network request blocked. Actual downloaded-file behavior on users' browsers remains a manual check.
+
 ## Run locally
 
 Requires **Node.js 24 or later** (uses built-in SQLite) and npm.

@@ -76,3 +76,9 @@ The task pane now defaults to 460 px, leaving more timeline visible. Short bars 
 `npm run build` passed, including TypeScript checks. The 14 other planner/interaction browser scenarios passed; the accessibility scenario initially detected low-contrast weekend header text. After darkening that text, its targeted rerun passed. All 15 relevant scenarios have passing evidence. No new scheduling or scale-performance claim is made.
 
 [Updated Gantt capture](evidence/gantt-refined.png).
+
+## Portable interactive preview
+
+`npm run build:portable` generates a self-contained browser app at `portable/Open-Project.html`. The downloadable ZIP includes that HTML and instructions. The original server build continues to use its authenticated HTTP API; only the separate portable build substitutes a browser-local storage adapter.
+
+Three added tests passed for persistence/revision conflicts, baseline retry idempotency/undo, and honest rejection of server-only features. The full domain/API suite now passes 44 tests. The production build and TypeScript checks pass. A browser smoke check loaded the exact HTML as a document with all other requests blocked: task creation survived reload, a baseline was saved and a JSON backup downloaded, with zero additional network requests. The backup contained one project and three history entries. Direct file navigation is blocked by managed Chromium policy, so downloaded-file behavior on a personal computer remains a manual check. No public URL or hosted deployment is claimed.
