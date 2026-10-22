@@ -47,7 +47,7 @@ Before redesign, an isolated performance recheck measured schedule p95 249.4 ms 
 ## Final combined verification
 
 - `npm test`: 41 tests passed.
-- `npm run test:e2e`: 17 functional scenarios passed; one performance scenario failed its feedback threshold and passed an isolated recheck (15.0 seconds). All 18 scenarios have passing evidence, but the final combined run was not wholly green.
+- `npm run test:e2e`: the last redesign run passed 17 functional scenarios and failed the performance feedback threshold. An earlier redesign run passed all 18 scenarios in 50.2 seconds; the latest full run was not wholly green.
 - `npm run typecheck` and `npm run build`: passed.
 - `npm ci`: completed from the committed lockfile (239 packages); rebuilt successfully afterward.
 - Built application startup: served HTML and five bundled assets, authenticated a demo session, created a software-delivery project, persisted a named baseline, and reloaded revision 1 successfully.
