@@ -30,6 +30,10 @@ The user-requested apple-design skill was installed from https://github.com/emil
 
 ## Rebuild
 
+For a local Apple silicon build, run `bash "Build Open Project.command"` from the extracted source folder. The builder uses an installed native Node 24+ or downloads a private checksum-verified official runtime, builds the app, creates and extracts a ZIP, checks signatures, tests the extracted app with the Chromium sandbox enabled, and opens the original app. It leaves existing workspace data in place. This requires Internet access for build dependencies, but no application hosting.
+
+This local builder has shell-syntax and prerequisite checks in the Linux workspace. Its end-to-end Mac execution is not claimed until it runs successfully on a Mac. It cannot provide Apple notarization.
+
 ```bash
 npm ci
 npm run build:desktop

@@ -1,5 +1,7 @@
 # Open Project
 
+For transfer to a new environment and the current Mac build status, start with [START-HERE.md](START-HERE.md). The user's M4 Pro launch failure remains unresolved; use a local Mac environment to diagnose it.
+
 A shared project planner with a synchronized task grid and Gantt timeline, resource capacity, progress, baselines, reusable templates, and an AI analyst that proposes validated changes.
 
 This is a prototype with web and experimental Mac desktop builds. Microsoft Project file compatibility and Windows packaging remain outside this release.
@@ -7,6 +9,14 @@ This is a prototype with web and experimental Mac desktop builds. Microsoft Proj
 ## Mac desktop development builds
 
 The desktop build bundles the real SQLite backend and a light Mac-style interface. See [Mac install, AI settings, backup and verification details](desktop/README.md). These are ad-hoc-signed development builds without notarization or actual Mac runtime validation.
+
+## Browser app
+
+The browser planner is available as a self-contained app and a full server application. The user has stopped the GitHub hosting effort; no browser-hosting workflow is included in this handoff. `scripts/smoke-web.ts` tests task creation, baseline capture, resource navigation, reload persistence, and backup contents in Chromium against the exact standalone HTML.
+
+The standalone preview saves work in the current browser, with JSON backup export. Live AI, accounts and team sharing require running the Express/SQLite server. The full server implementation remains available through the local run instructions below.
+
+The ongoing prompt-to-change workflow and retained requirements are recorded in [the prompt loop](docs/prompt-loop.md).
 
 ## Try without installing anything
 

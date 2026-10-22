@@ -7,19 +7,29 @@ if (process.platform !== "darwin")
   throw Error("Run this launch test on macOS.");
 if (arch !== process.arch)
   throw Error("The Mac launch test requires a matching runner architecture.");
-const executablePath = resolve(
-  `mac-release/Open Project-darwin-${arch}/Open Project.app/Contents/MacOS/Open Project`,
+const appPath = resolve(
+  process.argv[3] ?? `mac-release/Open Project-darwin-${arch}/Open Project.app`,
 );
+const executablePath = join(appPath, "Contents/MacOS/Open Project");
 const directory = mkdtempSync(join(tmpdir(), "open-project-mac-launch-"));
 const options = {
   executablePath,
   args: ["--desktop-smoke"],
+  chromiumSandbox: true,
   env: { ...process.env, OP_DESKTOP_DATA_DIR: directory },
   timeout: 30000,
 };
 let application: ElectronApplication | undefined;
 try {
   application = await electron.launch(options);
+  const launchState = await application.evaluate(({ app }) => ({
+    sandboxDisabled: app.commandLine.hasSwitch("no-sandbox"),
+    packaged: app.isPackaged,
+  }));
+  if (launchState.sandboxDisabled || !launchState.packaged)
+    throw Error(
+      "The launch check requires a packaged app with its sandbox enabled.",
+    );
   const page = await application.firstWindow();
   await page
     .getByRole("heading", { name: "Website redesign" })

@@ -1,5 +1,15 @@
 # Validation evidence
 
+## Browser delivery update — October 21, 2026
+
+The current domain/API suite passes all 49 tests. TypeScript checking and the single-file browser build pass. `scripts/smoke-web.ts` serves the exact release HTML under `/OPEN_PROJECT/`, blocks every other network request, creates a task and baseline, navigates Resources, reloads, and validates the exported backup contains the saved task and baseline. This passed locally and in GitHub Actions run `39717827427`.
+
+That run's build succeeded, but deployment failed because GitHub rejected automatic Pages enablement with **Resource not accessible by integration**. A live Pages URL is not yet verified. The repository owner must select GitHub Actions in Settings → Pages, then rerun the deployment or push to the preview branch.
+
+Mac launch tests passed on matching Apple silicon and Intel GitHub runners in run `39716929000`, but the user still reports a launch failure on their M4 Pro. The end-user Mac failure is unresolved; CI launch success does not establish that the downloaded app works on their machine. Browser delivery is now the immediate priority.
+
+The sections below retain historical validation evidence.
+
 Tested in the prepared Linux cloud workspace on October 21, 2026. This report distinguishes the implemented web prototype from live external services and native desktop applications.
 
 ## Current evidence
