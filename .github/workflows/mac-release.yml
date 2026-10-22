@@ -1,0 +1,64 @@
+name: Build downloadable Mac apps
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/mac-release]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [arm64, x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:desktop
+      - name: Package and ad-hoc sign on macOS
+        run: npm run package:mac:${{ matrix.architecture }}
+      - name: Validate bundle and make download
+        env:
+          BUILD_ARCH: ${{ matrix.architecture }}
+        run: |
+          APP="mac-release/Open Project-darwin-${BUILD_ARCH}/Open Project.app"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          file "$APP/Contents/MacOS/Open Project"
+          mkdir -p downloads
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "downloads/Open-Project-Mac-${BUILD_ARCH}.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-${{ matrix.architecture }}
+          path: downloads/*.zip
+          retention-days: 14
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: mac-*
+          merge-multiple: true
+          path: downloads
+      - name: Publish downloadable development release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "mac-preview-${GITHUB_RUN_NUMBER}" downloads/*.zip \
+            --target "$GITHUB_SHA" \
+            --title "Open Project Mac development build ${GITHUB_RUN_NUMBER}" \
+            --prerelease \
+            --notes-file desktop/RELEASE-NOTES.md
