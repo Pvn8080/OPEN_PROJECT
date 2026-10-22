@@ -898,3 +898,135 @@ textarea::placeholder {
 .sidebar .muted {
   color: #b8c7dc;
 }
+
+/* Gantt: readable labels, quiet grid and an explicit table/timeline divider. */
+.planner-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #b8c5d6 #f5f7fa;
+}
+.grid-header,
+.grid-cells {
+  border-right: 2px solid #c4cfdd;
+}
+.grid-header {
+  background: #f7f9fc;
+}
+.months {
+  background: #f7f9fc;
+  height: 28px;
+}
+.months > span {
+  top: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  border-color: var(--border);
+}
+.day-headers {
+  height: 38px;
+}
+.day-headers > span {
+  gap: 2px;
+  font-size: 11px;
+  border-right-color: #edf1f6;
+}
+.day-headers small {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+.day-headers .today {
+  background: #e8f0fc;
+  color: #124a9c;
+  box-shadow: inset 0 -2px #185abd;
+}
+.timeline-cells {
+  background-image:
+    linear-gradient(
+      90deg,
+      #f5f7fa 0,
+      #f5f7fa calc(var(--day-width) * 2),
+      transparent calc(var(--day-width) * 2)
+    ),
+    linear-gradient(90deg, #edf1f6 1px, transparent 1px);
+}
+.summary-row .timeline-cells {
+  background-color: #f7f9fc;
+}
+.planner-row.selected .timeline-cells {
+  background-color: #eef4fc;
+}
+.gantt-bar {
+  height: 22px;
+  top: 11px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px #172b4d15;
+}
+.bar-label {
+  top: 4px;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 500;
+}
+.bar-label.outside {
+  left: calc(100% + 9px);
+  right: auto;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+}
+.bar-completion {
+  border-bottom-width: 3px;
+}
+.summary-bar {
+  top: 24px;
+  height: 4px;
+  background: #596d87;
+}
+.summary-bar:before,
+.summary-bar:after {
+  border-top-color: #596d87;
+  border-top-width: 7px;
+}
+.summary-bar > span {
+  top: -16px;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 600;
+}
+.baseline-bar {
+  top: 38px;
+  height: 2px;
+  background: #8d9bad;
+  opacity: 0.6;
+  border-radius: 0;
+}
+.milestone-bar {
+  top: 18px;
+  width: 11px;
+  height: 11px;
+  background: #425d7d;
+  border-radius: 1px;
+}
+.milestone-label {
+  position: absolute;
+  transform: rotate(-45deg);
+  transform-origin: 0 0;
+  left: 10px;
+  top: -12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 400;
+  text-align: left;
+  pointer-events: none;
+}
+.today-line {
+  border-left: 1px dashed #4f87ce;
+  opacity: 0.75;
+}
+.dependency-layer {
+  opacity: 0.85;
+}

@@ -68,3 +68,11 @@ Independent review fixes preserve recorded actual-cost rates, retain pending edi
 - Targeted axe checks on the planner pass; a separate check with the AI panel open found no WCAG A/AA violations. This is not a full conformance audit. Desktop and narrow-screen captures were visually inspected.
 - [Full planner](evidence/open-project-redesign.png) and [AI panel](evidence/open-project-redesign-ai.png) show the current app.
 - Groq's official cookbook confirms free account-issued keys. No live key was created or available, and current quotas were not verified. The environment tool refused to modify the existing secret destination requirement; no changes were saved by that call. [Setup instructions](free-ai-setup.md) explain the remaining secure configuration.
+
+## Gantt visual refinement
+
+The task pane now defaults to 460 px, leaving more timeline visible. Short bars have external task labels and date/progress tooltips. Milestones have labels, phase tracks are distinct, baseline tracks are thinner, date headers use two-letter weekdays, and the Today marker no longer overlaps phase labels. Grid lines and dependency paths are quieter.
+
+`npm run build` passed, including TypeScript checks. The 14 other planner/interaction browser scenarios passed; the accessibility scenario initially detected low-contrast weekend header text. After darkening that text, its targeted rerun passed. All 15 relevant scenarios have passing evidence. No new scheduling or scale-performance claim is made.
+
+[Updated Gantt capture](evidence/gantt-refined.png).

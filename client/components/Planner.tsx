@@ -67,7 +67,7 @@ export function Planner({
     [columns, setColumns] = useState(false),
     [showOwner, setShowOwner] = useState(true),
     [showCompletion, setShowCompletion] = useState(true),
-    [gridWidth, setGridWidth] = useState(580),
+    [gridWidth, setGridWidth] = useState(460),
     [proposal, setProposal] = useState<{
       commands: Command[];
       preview: ChangePreview;
@@ -544,7 +544,9 @@ export function Planner({
                     d={`M${sx},${sy} H${sx + 10} V${ty} H${tx - 3}`}
                     fill="none"
                     stroke="#94a3b8"
-                    strokeWidth="1.2"
+                    strokeWidth="1.25"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
                     markerEnd="url(#arrow)"
                   />
                 );
@@ -760,7 +762,7 @@ export function Planner({
                         className="summary-bar"
                         style={{ left, width: barWidth }}
                       >
-                        <span>{t.title}</span>
+                        <span title={t.title}>{t.title}</span>
                       </div>
                     ) : t.duration === 0 ? (
                       <button
@@ -769,7 +771,9 @@ export function Planner({
                         aria-label={"Milestone: " + t.title}
                         style={{ left: left - 6 }}
                         onClick={() => (linking ? link(t.id) : onEdit(t.id))}
-                      />
+                      >
+                        <span className="milestone-label">{t.title}</span>
+                      </button>
                     ) : (
                       <div
                         className={
@@ -779,6 +783,7 @@ export function Planner({
                         }
                         data-task-id={t.id}
                         style={{ left, width: barWidth, background: color(t) }}
+                        title={`${t.title} · ${date(st.start, p.calendar.timezone)} – ${date(st.finish, p.calendar.timezone)} · ${Math.round(st.percent)}% complete`}
                         onPointerDown={(e) => {
                           if (linking) {
                             e.stopPropagation();
@@ -814,8 +819,15 @@ export function Planner({
                           style={{ width: t.percent + "%" }}
                         />
                         <span
-                          className="bar-label"
-                          style={{ color: barTextColor(color(t)) }}
+                          className={
+                            "bar-label " + (barWidth < 120 ? "outside" : "")
+                          }
+                          style={{
+                            color:
+                              barWidth < 120
+                                ? "var(--ink)"
+                                : barTextColor(color(t)),
+                          }}
                         >
                           {t.title}
                         </span>
@@ -860,9 +872,8 @@ export function Planner({
                   ),
                 height: "100%",
               }}
-            >
-              <span>Today</span>
-            </div>
+              aria-hidden="true"
+            />
           </div>
           <button
             className="table-add"

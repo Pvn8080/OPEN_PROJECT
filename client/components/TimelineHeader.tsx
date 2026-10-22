@@ -40,12 +40,13 @@ export const TimelineHeader = memo(function TimelineHeader({
           <span
             key={i}
             style={{ width: zoom }}
+            title={d.toFormat("cccc, MMMM d, yyyy")}
             className={
               (d.weekday > 5 ? "weekend " : "") +
               (d.hasSame(current, "day") ? "today" : "")
             }
           >
-            <small>{d.toFormat("ccc").slice(0, 1)}</small>
+            <small>{d.toFormat("ccc").slice(0, 2)}</small>
             {d.day}
           </span>
         ))}
